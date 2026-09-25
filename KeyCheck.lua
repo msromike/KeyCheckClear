@@ -143,11 +143,15 @@ function KeyCheck:DisplayResult(key)
     local w = self.widgets
     local base, override = Lookup(key)
 
+    -- An addon override is what the key actually does right now, so it wins;
+    -- whatever it hides underneath doesn't matter for "is this key free?"
     local text = Key(KeyText(key)) .. "\n"
-        .. (base and (Label("Bound to:") .. " " .. Result(base)) or Result(nil))
     if override then
-        text = text .. "\n" .. Label("Addon override:") .. " " .. Override(override)
-            .. " " .. Label("(normally:") .. " " .. Result(base) .. Label(")")
+        text = text .. Label("Bound to:") .. " " .. Override(override) .. " " .. Label("(addon)")
+    elseif base then
+        text = text .. Label("Bound to:") .. " " .. Result(base)
+    else
+        text = text .. Result(nil)
     end
     w.result:SetText(text)
     self.window:DoLayout() -- result lines changed height
