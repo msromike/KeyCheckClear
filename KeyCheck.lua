@@ -5,9 +5,10 @@ local KeyCheck = LibStub("AceAddon-3.0"):NewAddon("KeyCheck", "AceConsole-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
 
 local ICON = "Interface\\Icons\\INV_Misc_Key_12" -- file ID 134246 (wowhead classic icon DB)
-local HISTORY_SIZE = 50
+local HISTORY_SIZE = 100 -- a combo check adds 8 lines at once
 local NONE = "|cff999999None yet|r"
-local HELP = "Click the button, then press any key or key combo.\n"
+local GROUP_DIVIDER = "|cff999999- - -|r" -- between every key press in Recent
+local HELP = "Hover over the button, then press any key or key combo.\n"
     .. "|cff999999Esc stops listening  -  Esc again closes the window|r"
 
 local defaults = {
@@ -15,6 +16,7 @@ local defaults = {
         minimap = { hide = false },
         window = { width = 380, height = 520 }, -- KeyCheckWindow status table (size + position)
         bgAlpha = 1,
+        allCombos = false, -- "Check all modifier combos" tick box
     },
 }
 
@@ -38,6 +40,26 @@ local function Lookup(key)
     return base, override
 end
 
+-- The 8 modifier combinations of a key, in display order. The game always writes
+-- modifiers ALT-CTRL-SHIFT, so these are the exact strings GetBindingAction knows
+-- (same set as EllesmereUI Quickdraw's MOD_COMBOS).
+local COMBOS = { "", "SHIFT-", "CTRL-", "ALT-", "CTRL-SHIFT-", "ALT-SHIFT-", "ALT-CTRL-", "ALT-CTRL-SHIFT-" }
+local MODIFIERS = { "ALT-", "CTRL-", "SHIFT-", "META-" }
+
+-- SHIFT-D -> D: strip the modifier prefixes, in the order the game writes them
+local function BaseKey(key)
+    for _, m in ipairs(MODIFIERS) do
+        if key:sub(1, #m) == m then key = key:sub(#m + 1) end
+    end
+    return key
+end
+
+local function CombosOf(key)
+    local base, keys = BaseKey(key), {}
+    for i, prefix in ipairs(COMBOS) do keys[i] = prefix .. base end
+    return keys
+end
+
 -------------------------------------------------------------------------------
 --  Layout: stack children top to bottom; full-width children stretch, the rest
 --  are centered, and the child flagged fillHeight takes the remaining height
@@ -57,7 +79,7 @@ AceGUI:RegisterLayout("KeyCheckStack", function(content, children)
                 child:SetWidth(width * child.relWidth)
             end
             if child.DoLayout then child:DoLayout() end
-            used = used + (child.frame:GetHeight() or 0)
+            used = used + (child.frame:GetHeight() or 0) + (child.spaceAfter or 0)
         end
     end
     if filler then
@@ -76,7 +98,7 @@ AceGUI:RegisterLayout("KeyCheckStack", function(content, children)
             frame:SetPoint("LEFT", content)
             frame:SetPoint("RIGHT", content)
         end
-        y = y + (frame:GetHeight() or 0)
+        y = y + (frame:GetHeight() or 0) + (child.spaceAfter or 0) -- spaceAfter: extra gap in px
     end
     if content.obj.LayoutFinished then
         content.obj:LayoutFinished(nil, y)
@@ -124,7 +146,14 @@ end
 
 function KeyCheck:RefreshHistory()
     local w = self.widgets
-    w.history:SetText(#self.history > 0 and table.concat(self.history, "\n") or NONE)
+    -- history is a list of groups (one per key press, newest first), with a divider
+    -- between every two presses
+    local out = {}
+    for i, group in ipairs(self.history) do
+        if i > 1 then out[#out + 1] = GROUP_DIVIDER end
+        for _, line in ipairs(group) do out[#out + 1] = line end
+    end
+    w.history:SetText(#out > 0 and table.concat(out, "\n") or NONE)
     w.recent:DoLayout()
 end
 
@@ -139,36 +168,53 @@ local function KeyText(key)
     return GetBindingText and GetBindingText(key) or key
 end
 
-function KeyCheck:DisplayResult(key)
-    local w = self.widgets
-    local base, override = Lookup(key)
-
-    -- An addon override is what the key actually does right now, so it wins;
-    -- whatever it hides underneath doesn't matter for "is this key free?"
-    local text = Key(KeyText(key)) .. "\n"
+-- An addon override is what the key actually does right now, so it wins;
+-- whatever it hides underneath doesn't matter for "is this key free?"
+local function ResultText(base, override)
     if override then
-        text = text .. Label("Bound to:") .. " " .. Override(override) .. " " .. Label("(addon)")
+        return Label("Bound to:") .. " " .. Override(override) .. " " .. Label("(addon)")
     elseif base then
-        text = text .. Label("Bound to:") .. " " .. Result(base)
-    else
-        text = text .. Result(nil)
+        return Label("Bound to:") .. " " .. Result(base)
     end
-    w.result:SetText(text)
-    self.window:DoLayout() -- result lines changed height
-    return base, override
+    return Result(nil)
 end
 
-function KeyCheck:ShowResult(key)
-    local base, override = self:DisplayResult(key)
-
+local function RecentLine(key, base, override)
     local line = Key(KeyText(key)) .. " " .. Label("-") .. " "
     if override then
-        line = line .. Override(override) .. " " .. Label("(addon)")
-    else
-        line = line .. Result(base)
+        return line .. Override(override) .. " " .. Label("(addon)")
     end
-    table.insert(self.history, 1, line)
-    self.history[HISTORY_SIZE + 1] = nil
+    return line .. Result(base)
+end
+
+-- One key normally; with "Check all modifier combos" ticked, all 8 combos of its
+-- base key, one line each (free or bound), in COMBOS order.
+function KeyCheck:ShowResult(key)
+    local keys = self.db.profile.allCombos and CombosOf(key) or { key }
+    local resultLines, recentLines = {}, {}
+    for i, k in ipairs(keys) do
+        local base, override = Lookup(k)
+        if #keys == 1 then
+            resultLines[i] = Key(KeyText(k)) .. "\n" .. ResultText(base, override)
+        else
+            resultLines[i] = Key(KeyText(k)) .. Label(":") .. " " .. ResultText(base, override)
+        end
+        recentLines[i] = RecentLine(k, base, override)
+    end
+    self.widgets.result:SetText(table.concat(resultLines, "\n"))
+    self.window:DoLayout() -- result lines changed height
+
+    -- newest press on top as one group, its lines kept in combo order;
+    -- drop the oldest groups once the total passes HISTORY_SIZE lines
+    table.insert(self.history, 1, recentLines)
+    local total = 0
+    for i, group in ipairs(self.history) do
+        total = total + #group
+        if total > HISTORY_SIZE and i > 1 then
+            for j = #self.history, i, -1 do self.history[j] = nil end
+            break
+        end
+    end
     self:RefreshHistory()
 end
 
@@ -237,6 +283,16 @@ function KeyCheck:OpenWindow()
     CenteredLabel(frame, GameFontHighlight, HELP)
     Spacer(frame)
 
+    local combos = AceGUI:Create("CheckBox")
+    combos:SetLabel("Check all modifier combos")
+    combos:SetValue(self.db.profile.allCombos)
+    combos:SetWidth(24 + combos.text:GetStringWidth() + 8) -- box + label, so the layout can center it
+    combos:SetCallback("OnValueChanged", function(_, _, value)
+        self.db.profile.allCombos = value and true or false
+    end)
+    combos.spaceAfter = 7 -- half-line gap keeps it attached to the button it controls
+    frame:AddChild(combos)
+
     local kb = AceGUI:Create("KeyCheckKeyButton")
     kb:SetCallback("OnKeyChanged", function(_, _, key)
         if key and key ~= "" then self:ShowResult(key) end
@@ -272,6 +328,7 @@ function KeyCheck:OpenWindow()
         w.result.label:SetSpacing(0)
         w.history.label:SetSpacing(0)
         w.recent.fillHeight = nil
+        combos.spaceAfter = nil
         _G.KeyCheckFrame = nil
         self.window, self.widgets = nil, nil
         AceGUI:Release(widget)

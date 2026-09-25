@@ -2,9 +2,10 @@
 KeyCheckKeyButton Widget
 KeyCheck's own key-capture button, adapted from AceGUI's Keybinding widget
 (Libs/AceGUI-3.0/widgets/AceGUIWidget-Keybinding.lua). A large, roughly square
-Blizzard button: click it, press a key, and it fires OnKeyChanged(key). It only
-ever shows its idle hint or "Waiting for input", never the key, and has no
-floating popup. Private type, so nothing here is shared through AceGUI's widget pool.
+Blizzard button: hover it, press a key, and it fires OnKeyChanged(key). It listens
+only while the mouse is over it (no click), never in combat, and only ever shows
+its idle hint or "Waiting for input". Private type, so nothing here is shared
+through AceGUI's widget pool.
 -------------------------------------------------------------------------------]]
 local Type, Version = "KeyCheckKeyButton", 1
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
@@ -14,13 +15,15 @@ local pairs = pairs
 local IsShiftKeyDown, IsControlKeyDown, IsAltKeyDown = IsShiftKeyDown, IsControlKeyDown, IsAltKeyDown
 local CreateFrame, UIParent = CreateFrame, UIParent
 
-local IDLE_TEXT = "Click here, then press a key"
+local IDLE_TEXT = "Hover here to check a key"
 local LISTEN_TEXT = "Waiting for input"
 
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
 local function SetListening(self, on)
+    -- a mouse resting on the button mid-fight must not swallow ability keys
+    if on and (self.disabled or InCombatLockdown()) then on = false end
     local button = self.button
     button:EnableKeyboard(on)
     button:EnableMouseWheel(on)
@@ -38,21 +41,19 @@ end
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
+-- Hover to listen: entering the button arms it, leaving disarms it
 local function Control_OnEnter(frame)
+    SetListening(frame.obj, true)
     frame.obj:Fire("OnEnter")
 end
 
 local function Control_OnLeave(frame)
+    SetListening(frame.obj, false)
     frame.obj:Fire("OnLeave")
 end
 
+-- clicks don't arm anything anymore; just drop any edit-box focus
 local function KeyButton_OnClick(frame, button)
-    if button == "LeftButton" or button == "RightButton" then
-        local self = frame.obj
-        if not self.disabled then
-            SetListening(self, not self.waitingForKey)
-        end
-    end
     AceGUI:ClearFocus()
 end
 
@@ -77,7 +78,9 @@ local function KeyButton_OnKeyDown(frame, key)
         if IsAltKeyDown() then keyPressed = "ALT-" .. keyPressed end
     end
 
-    SetListening(self, false)
+    -- keep listening for the next key while still hovered; Esc stops until the
+    -- mouse leaves and comes back, so a second Esc can close the window
+    SetListening(self, keyPressed ~= "" and frame:IsMouseOver())
     if not self.disabled then
         self:Fire("OnKeyChanged", keyPressed)
     end
