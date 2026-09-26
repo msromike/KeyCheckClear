@@ -5,11 +5,9 @@
 ## Version: 0.4.0
 ## SavedVariables: KeyCheckDB
 ## IconTexture: Interface\Icons\INV_Misc_Key_12
-## X-ForeverSVFix: 6
 
 embeds.xml
 Widgets\KeyCheckWindow.lua
 Widgets\KeyCheckKeyButton.lua
 KeyCheck.lua
 
-ForeverSVFixData\KeyCheck.lua
