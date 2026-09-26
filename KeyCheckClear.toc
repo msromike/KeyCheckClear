@@ -1,0 +1,15 @@
+## Interface: 120100, 120105, 16001, 50504, 38002, 20506, 11509
+## Title: KeyCheckClear
+## Category: Utilities
+## Notes: Press a key to see what it is bound to. /kcc or the minimap button.
+## Author: Mike
+## Version: 1.0.0
+## X-License: MIT
+## SavedVariables: KeyCheckClearDB
+## IconTexture: Interface\Icons\INV_Misc_Key_12
+
+embeds.xml
+Widgets\KeyCheckClearWindow.lua
+Widgets\KeyCheckClearKeyButton.lua
+KeyCheckClear.lua
+

@@ -1,6 +1,6 @@
 --[[-----------------------------------------------------------------------------
-KeyCheckKeyButton Widget
-KeyCheck's own key-capture button, adapted from AceGUI's Keybinding widget
+KeyCheckClearKeyButton Widget
+KeyCheckClear's own key-capture button, adapted from AceGUI's Keybinding widget
 (Libs/AceGUI-3.0/widgets/AceGUIWidget-Keybinding.lua), Copyright (c) 2007,
 Ace3 Development Team, BSD-style license. A large, roughly square
 Blizzard button: hover it, press a key, and it fires OnKeyChanged(key). It listens
@@ -8,7 +8,7 @@ only while the mouse is over it (no click), never in combat, and only ever shows
 its idle hint or "Waiting for input". Private type, so nothing here is shared
 through AceGUI's widget pool.
 -------------------------------------------------------------------------------]]
-local Type, Version = "KeyCheckKeyButton", 1
+local Type, Version = "KeyCheckClearKeyButton", 1
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -16,7 +16,7 @@ local pairs = pairs
 local IsShiftKeyDown, IsControlKeyDown, IsAltKeyDown = IsShiftKeyDown, IsControlKeyDown, IsAltKeyDown
 local CreateFrame, UIParent = CreateFrame, UIParent
 
-local IDLE_TEXT = "Hover here to check a key"
+local IDLE_TEXT = "Hover mouse here\nto check keybind"
 local LISTEN_TEXT = "Waiting for input"
 
 --[[-----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ local methods = {
 Constructor
 -------------------------------------------------------------------------------]]
 local function Constructor()
-    local name = "KeyCheckKeyButton" .. AceGUI:GetNextWidgetNum(Type)
+    local name = "KeyCheckClearKeyButton" .. AceGUI:GetNextWidgetNum(Type)
 
     local frame = CreateFrame("Frame", nil, UIParent)
     local button = CreateFrame("Button", name, frame, "UIPanelButtonTemplate")

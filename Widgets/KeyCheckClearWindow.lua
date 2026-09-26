@@ -1,6 +1,6 @@
 --[[-----------------------------------------------------------------------------
-KeyCheckWindow Container
-KeyCheck's own window type, adapted from AceGUI's Frame container
+KeyCheckClearWindow Container
+KeyCheckClear's own window type, adapted from AceGUI's Frame container
 (Libs/AceGUI-3.0/widgets/AceGUIContainer-Frame.lua), Copyright (c) 2007,
 Ace3 Development Team, BSD-style license. Private type, so nothing
 here is shared with other addons through AceGUI's widget pool.
@@ -8,7 +8,7 @@ Differences from Frame: X close button, no status bar, centered Close button,
 and a solid background whose opacity is set with SetBgAlpha (the stock
 UI-DialogBox-Background texture is itself translucent, so it never reaches black).
 -------------------------------------------------------------------------------]]
-local Type, Version = "KeyCheckWindow", 1
+local Type, Version = "KeyCheckClearWindow", 1
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -97,10 +97,17 @@ local methods = {
 
     ["OnHeightSet"] = function(self, height)
         local content = self.content
-        local contentheight = height - 71
+        local contentheight = height - 79
         if contentheight < 0 then contentheight = 0 end
         content:SetHeight(contentheight)
         content.height = contentheight
+    end,
+
+    -- the window is exactly as tall as its content: 79 = the content's top and bottom insets
+    ["LayoutFinished"] = function(self, width, height)
+        if height then
+            self:SetHeight(height + 79)
+        end
     end,
 
     ["SetTitle"] = function(self, title)
@@ -252,7 +259,7 @@ local function Constructor()
 
     --Container Support
     local content = CreateFrame("Frame", nil, frame)
-    content:SetPoint("TOPLEFT", 17, -27)
+    content:SetPoint("TOPLEFT", 17, -35) -- clear of the title plate, which hangs 28 px into the frame
     content:SetPoint("BOTTOMRIGHT", -17, 44)
 
     local widget = {
