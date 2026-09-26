@@ -1,7 +1,8 @@
 --[[-----------------------------------------------------------------------------
 KeyCheckKeyButton Widget
 KeyCheck's own key-capture button, adapted from AceGUI's Keybinding widget
-(Libs/AceGUI-3.0/widgets/AceGUIWidget-Keybinding.lua). A large, roughly square
+(Libs/AceGUI-3.0/widgets/AceGUIWidget-Keybinding.lua), Copyright (c) 2007,
+Ace3 Development Team, BSD-style license. A large, roughly square
 Blizzard button: hover it, press a key, and it fires OnKeyChanged(key). It listens
 only while the mouse is over it (no click), never in combat, and only ever shows
 its idle hint or "Waiting for input". Private type, so nothing here is shared

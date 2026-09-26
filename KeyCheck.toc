@@ -1,8 +1,9 @@
-## Interface: 16001
+## Interface: 120100, 120105, 16001, 50504, 38002, 20506, 11509
 ## Title: KeyCheck
 ## Notes: Press a key to see what it is bound to. /kc or the minimap button.
 ## Author: Mike
-## Version: 0.4.0
+## Version: 1.0.0
+## X-License: MIT
 ## SavedVariables: KeyCheckDB
 ## IconTexture: Interface\Icons\INV_Misc_Key_12
 

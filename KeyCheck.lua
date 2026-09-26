@@ -1,7 +1,7 @@
 -- KeyCheck: press a key (or key chord) and see what it is bound to.
 -- Blizzard's Keybindings panel only answers action -> key; this answers key -> action.
 
-local KeyCheck = LibStub("AceAddon-3.0"):NewAddon("KeyCheck", "AceConsole-3.0")
+local KeyCheck = LibStub("AceAddon-3.0"):NewAddon("KeyCheck", "AceConsole-3.0", "AceEvent-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
 
 local ICON = "Interface\\Icons\\INV_Misc_Key_12" -- file ID 134246 (wowhead classic icon DB)
@@ -124,13 +124,36 @@ function KeyCheck:OnInitialize()
             OnTooltipShow = function(tt)
                 tt:AddLine("KeyCheck")
                 tt:AddLine("|cffeda55fClick|r to find out what a key is bound to", 0.8, 0.8, 0.8)
+                tt:AddLine("|cffeda55f/kc minimap|r hides this button", 0.8, 0.8, 0.8)
             end,
         })
         DBIcon:Register("KeyCheck", self.ldb, self.db.profile.minimap)
     end
 
-    self:RegisterChatCommand("kc", "Toggle")
-    self:RegisterChatCommand("keycheck", "Toggle")
+    self:RegisterChatCommand("kc", "SlashCommand")
+    self:RegisterChatCommand("keycheck", "SlashCommand")
+end
+
+-- /kc opens or closes the window; /kc minimap shows or hides the minimap button
+function KeyCheck:SlashCommand(input)
+    if strtrim(input or ""):lower() ~= "minimap" then
+        return self:Toggle()
+    end
+    local mm = self.db.profile.minimap
+    mm.hide = not mm.hide
+    local DBIcon = LibStub("LibDBIcon-1.0", true)
+    if DBIcon then
+        if mm.hide then DBIcon:Hide("KeyCheck") else DBIcon:Show("KeyCheck") end
+    end
+    self:Print(mm.hide and "Minimap button hidden. /kc minimap brings it back." or "Minimap button shown.")
+end
+
+-- KeyCheck is an out-of-combat tool: the window closes when combat starts and
+-- won't open during it, so nothing here ever swallows keys or edits bindings in a fight
+function KeyCheck:OnEnable()
+    self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
+        if self.window then self.window:Hide() end
+    end)
 end
 
 -------------------------------------------------------------------------------
@@ -139,6 +162,8 @@ end
 function KeyCheck:Toggle()
     if self.window then
         self.window:Hide() -- OnClose releases it
+    elseif InCombatLockdown() then
+        self:Print("Not available in combat.")
     else
         self:OpenWindow()
     end

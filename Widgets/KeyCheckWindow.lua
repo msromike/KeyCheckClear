@@ -1,7 +1,8 @@
 --[[-----------------------------------------------------------------------------
 KeyCheckWindow Container
 KeyCheck's own window type, adapted from AceGUI's Frame container
-(Libs/AceGUI-3.0/widgets/AceGUIContainer-Frame.lua). Private type, so nothing
+(Libs/AceGUI-3.0/widgets/AceGUIContainer-Frame.lua), Copyright (c) 2007,
+Ace3 Development Team, BSD-style license. Private type, so nothing
 here is shared with other addons through AceGUI's widget pool.
 Differences from Frame: X close button, no status bar, centered Close button,
 and a solid background whose opacity is set with SetBgAlpha (the stock
@@ -162,11 +163,7 @@ local function Constructor()
     frame:SetFrameLevel(100)
     frame:SetBackdrop(FrameBackdrop)
     frame:SetBackdropColor(0, 0, 0, 1)
-    if frame.SetResizeBounds then -- WoW 10.0
-        frame:SetResizeBounds(300, 400)
-    else
-        frame:SetMinResize(300, 400)
-    end
+    frame:SetResizeBounds(300, 400)
     frame:SetToplevel(true)
     frame:SetScript("OnShow", Frame_OnShow)
     frame:SetScript("OnHide", Frame_OnClose)
