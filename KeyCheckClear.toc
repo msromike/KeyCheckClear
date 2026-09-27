@@ -5,6 +5,7 @@
 ## Author: msromike
 ## Version: 1.0.0
 ## X-License: MIT
+## X-Curse-Project-ID: 1713684
 ## SavedVariables: KeyCheckClearDB
 ## IconTexture: Interface\AddOns\KeyCheckClear\media\kcc
 
