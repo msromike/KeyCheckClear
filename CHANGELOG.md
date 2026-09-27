@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 (2026-09-26)
+
+- Code split into Ace modules (Core, Bindings, Results, Window). No change in behavior.
+- Minimap icon centered for Retail and Forever (it sits slightly up-left on Classic Era).
+
 ## 1.0.1 (2026-09-26)
 
 - Smaller download: screenshots and logo images are no longer packaged with the addon.
