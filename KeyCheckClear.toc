@@ -6,7 +6,7 @@
 ## Version: 1.0.0
 ## X-License: MIT
 ## SavedVariables: KeyCheckClearDB
-## IconTexture: Interface\Icons\INV_Misc_Key_12
+## IconTexture: Interface\AddOns\KeyCheckClear\media\kcc
 
 embeds.xml
 Widgets\KeyCheckClearWindow.lua
