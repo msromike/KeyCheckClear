@@ -25,6 +25,7 @@ ignore:
   - media/02-window.png
   - media/03-single-key.png
   - media/04-all-modifier-combos.png
+  - media/04-all-modifier-combos-small.png
   - media/05-clear-buttons.png
   - media/06-undo.png
   - media/kcc.png

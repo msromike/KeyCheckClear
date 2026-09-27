@@ -4,7 +4,7 @@ Press a key or key combo to see what it's bound to. You can optionally clear the
 
 WoW's keybinding screen works fine to bind to an addon or internal function. KeyCheckClear works from the other angle. Is this key available? So this addon is handy when you're looking for a free key, or trying to figure out why a key does something you didn't expect. "Why are my macro modifiers not working? What is SHIFT+F12 bound to anyway?"
 
-![KeyCheckClear showing every modifier combo of M](media/04-all-modifier-combos.png)
+![KeyCheckClear showing every modifier combo of M](media/04-all-modifier-combos-small.png)
 
 ## Using it
 
@@ -17,8 +17,6 @@ Open the window with `/kcc` or with the minimap button. Hover the mouse over the
 Keys bound by another addon show in orange with "(addon)". They don't get an X, because that binding belongs to the other addon.
 
 The window closes when you enter combat and won't open until you're out.
-
-![Clear buttons](media/05-clear-buttons.png)
 
 ## Commands
 
