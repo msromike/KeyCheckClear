@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 (2026-09-26)
+
+- Smaller download: screenshots and logo images are no longer packaged with the addon.
+
 ## 1.0.0 (2026-09-26)
 
 Initial release.

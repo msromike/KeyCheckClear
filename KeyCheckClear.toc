@@ -3,7 +3,7 @@
 ## Category: Utilities
 ## Notes: See what any key or key combo is bound to, and clear bindings with one click. Open it with /kcc or the minimap button.
 ## Author: msromike
-## Version: 1.0.0
+## Version: 1.0.1
 ## X-License: MIT
 ## X-Curse-Project-ID: 1713684
 ## SavedVariables: KeyCheckClearDB
