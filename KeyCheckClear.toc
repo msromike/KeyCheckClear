@@ -1,8 +1,8 @@
 ## Interface: 120100, 120105, 16001, 50504, 38002, 20506, 11509
 ## Title: KeyCheckClear
 ## Category: Utilities
-## Notes: Press a key to see what it is bound to. /kcc or the minimap button.
-## Author: Mike
+## Notes: See what any key or key combo is bound to, and clear bindings with one click. Open it with /kcc or the minimap button.
+## Author: msromike
 ## Version: 1.0.0
 ## X-License: MIT
 ## SavedVariables: KeyCheckClearDB

@@ -4,7 +4,7 @@
 local KeyCheckClear = LibStub("AceAddon-3.0"):NewAddon("KeyCheckClear", "AceConsole-3.0", "AceEvent-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
 
-local ICON = "Interface\\Icons\\INV_Misc_Key_12" -- file ID 134246 (wowhead classic icon DB)
+local ICON = "Interface\\AddOns\\KeyCheckClear\\media\\minimap_icon" -- media/minimap_icon.tga
 local NONE = "|cff999999Nothing checked yet|r"
 local HELP = "Hover over the button.\nThen press any key or key combo."
 local LISTEN_NOTE = "Move mouse to stop listening"
